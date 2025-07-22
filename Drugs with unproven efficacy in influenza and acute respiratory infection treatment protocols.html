@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лекарства с недоказанной эффективностью</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 24px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-item {
+            text-align: center;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #f0f0f0;
+            background: #fafafa;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .chart-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #444;
+            line-height: 1.4;
+        }
+        
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pie-35 {
+            background: conic-gradient(#ff6b6b 0deg 126deg, #e0e0e0 126deg 360deg);
+        }
+        
+        .pie-100 {
+            background: conic-gradient(#ff6b6b 0deg 360deg);
+        }
+        
+        .pie-50 {
+            background: conic-gradient(#ff6b6b 0deg 180deg, #e0e0e0 180deg 360deg);
+        }
+        
+        .percentage-big {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 15px 0;
+        }
+        
+        .drugs-section {
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .drugs-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #ff6b6b;
+            padding-bottom: 4px;
+        }
+        
+        .drugs-list {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .drug-item {
+            display: inline-block;
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 11px;
+            border: 1px solid #ffcdd2;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .drug-item:hover {
+            background-color: #f44336;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .drug-item.homeopathy {
+            background-color: #e1bee7;
+            border-color: #e1bee7;
+            color: #7b1fa2;
+        }
+        
+        .drug-item.homeopathy:hover {
+            background-color: #9c27b0;
+            color: white;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%);
+            transition: opacity 0.3s ease;
+            bottom: 100%;
+            left: 50%;
+            margin-bottom: 5px;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .drug-item.homeopathy:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .bads-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #ff9800;
+            padding-bottom: 4px;
+        }
+        
+        .bad-item {
+            display: inline-block;
+            background-color: #fff3e0;
+            color: #f57c00;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 11px;
+            border: 1px solid #ffcc02;
+        }
+        
+        .empty-bads {
+            color: #999;
+            font-style: italic;
+            font-size: 12px;
+        }
+        
+        .stats-summary {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .summary-stats {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .summary-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .source-link {
+            color: #fff;
+            text-decoration: underline;
+            transition: opacity 0.3s ease;
+        }
+        
+        .source-link:hover {
+            opacity: 0.8;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+        }
+        
+        .ineffective-color {
+            background-color: #ff6b6b;
+        }
+        
+        .unspecified-color {
+            background-color: #e0e0e0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chart-item {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        
+        .chart-item:nth-child(1) { animation-delay: 0.1s; }
+        .chart-item:nth-child(2) { animation-delay: 0.2s; }
+        .chart-item:nth-child(3) { animation-delay: 0.3s; }
+        .chart-item:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h2>Лекарства с недоказанной эффективностью в протоколах лечения гриппа и ОРВИ</h2>
+        
+        <div class="charts-grid">
+            <!-- 1-я карточка: 35% -->
+            <div class="chart-item">
+                <div class="chart-title">Грипп у детей:<br>основное лечение</div>
+                <div class="pie-chart pie-35"></div>
+                <div class="percentage-big">35%</div>
+                <div class="stats-summary">7 из 20 препаратов неэффективны</div>
+                
+                <div class="drugs-section">
+                    <div class="drugs-title">Неэффективные лекарства:</div>
+                    <div class="drugs-list">
+                        <span class="drug-item">Бронхолитин</span>
+                        <span class="drug-item">Туспрекс</span>
+                        <span class="drug-item">Синекод</span>
+                        <span class="drug-item">Мукалтин</span>
+                    </div>
+                    
+                    <div class="bads-title">БАДы:</div>
+                    <div class="drugs-list">
+                        <span class="bad-item">Корень алтея</span>
+                        <span class="bad-item">Мать-и-мачеха</span>
+                        <span class="bad-item">Сосновые шишки</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2-я карточка: 50% -->
+            <div class="chart-item">
+                <div class="chart-title">Грипп у детей:<br>тяжелые случаи</div>
+                <div class="pie-chart pie-50"></div>
+                <div class="percentage-big">50%</div>
+                <div class="stats-summary">1 из 2 препаратов неэффективны</div>
+                
+                <div class="drugs-section">
+                    <div class="drugs-title">Неэффективные лекарства:</div>
+                    <div class="drugs-list">
+                        <span class="drug-item">Виферон</span>
+                    </div>
+                    
+                    <div class="bads-title">БАДы:</div>
+                    <div class="empty-bads">Не указаны</div>
+                </div>
+            </div>
+            
+            <!-- 3-я карточка: 100% -->
+            <div class="chart-item">
+                <div class="chart-title">Грипп у детей:<br>устранение причины</div>
+                <div class="pie-chart pie-100"></div>
+                <div class="percentage-big">100%</div>
+                <div class="stats-summary">7 из 7 препаратов неэффективны</div>
+                
+                <div class="drugs-section">
+                    <div class="drugs-title">Неэффективные лекарства:</div>
+                    <div class="drugs-list">
+                        <span class="drug-item">Гриппферон</span>
+                        <span class="drug-item homeopathy">
+                            Анаферон
+                            <span class="tooltip">Гомеопатический препарат</span>
+                        </span>
+                        <span class="drug-item">Оксолиновая мазь</span>
+                        <span class="drug-item">Ремантадин</span>
+                        <span class="drug-item">Амиксин</span>
+                        <span class="drug-item">Арбидол</span>
+                        <span class="drug-item">Озельтамивир (Тамифлю)</span>
+                    </div>
+                    
+                    <div class="bads-title">БАДы:</div>
+                    <div class="empty-bads">Не указаны</div>
+                </div>
+            </div>
+            
+            <!-- 4-я карточка: 100% -->
+            <div class="chart-item">
+                <div class="chart-title">ОРВИ:<br>рекомендации всем</div>
+                <div class="pie-chart pie-100"></div>
+                <div class="percentage-big">100%</div>
+                <div class="stats-summary">4 из 4 препаратов неэффективны</div>
+                
+                <div class="drugs-section">
+                    <div class="drugs-title">Неэффективные лекарства:</div>
+                    <div class="drugs-list">
+                        <span class="drug-item">Эреспал</span>
+                        <span class="drug-item homeopathy">
+                            Афлубин
+                            <span class="tooltip">Гомеопатический препарат</span>
+                        </span>
+                        <span class="drug-item">Иpc-19</span>
+                        <span class="drug-item">Лизаты бактерий (Имудон)</span>
+                    </div>
+                    
+                    <div class="bads-title">БАДы:</div>
+                    <div class="empty-bads">Не указаны</div>
+                </div>
+            </div>
+        </div>
+        <div class="summary-box">
+            <div class="summary-stats">Более половины рекомендуемых препаратов (58%) от гриппа и ОРВИ не имеют доказанной эффективности.</div>
+            <div class="summary-text">
+                Источник: <a href="https://moh.tj/wp-content/uploads/2024/10/MAXMEI-DASTUROI-KLINIK-OID-BA-TASHHISU-TABOBATI-BEMORON-DAR-SATI-SHABAKAI-MUASSISANOI-KEMAKI-AVVALIYAI-TIBBIYU-SANITAR-.pdf" class="source-link" target="_blank">Свод клинических правил по диагностике и лечению пациентов на уровне ПМСП (2020)</a>, Минздрав РТ
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
