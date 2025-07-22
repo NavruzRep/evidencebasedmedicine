@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инфографика: Иерархия Доказательств</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение шрифта Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Стили для контейнера пирамиды и ее уровней */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column; /* Располагаем уровни друг над другом */
+            align-items: center; /* Центрируем уровни */
+        }
+        .level {
+            transition: all 0.3s ease-in-out;
+            width: 100%; /* На мобильных устройствах уровень занимает всю ширину */
+        }
+        /* Эффект при наведении на уровень пирамиды */
+        .level:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            z-index: 10; /* Уровень будет поверх других при наведении */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">🔺 Иерархия доказательств в медицине</h1>
+            <p class="text-lg text-gray-600">Краткое руководство по оценке исследований</p>
+        </header>
+
+        <!-- Контейнер для пирамиды -->
+        <div class="pyramid-container space-y-2">
+
+            <!-- Уровень 1: Вершина пирамиды (самый надежный) -->
+            <div class="level md:w-1/2 bg-emerald-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥇</span>Систематические обзоры и метаанализы</h2>
+                <p class="text-sm"><strong>Высший уровень.</strong> Анализ всех качественных исследований по теме для получения самого надежного общего вывода.</p>
+            </div>
+
+            <!-- Уровень 2: Золотой стандарт -->
+            <div class="level md:w-2/3 bg-sky-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥈</span>Рандомизированные контролируемые исследования (РКИ)</h2>
+                <p class="text-sm"><strong>«Золотой стандарт» проверки.</strong> Группы пациентов случайно получают лекарство или плацебо для объективной оценки эффекта.</p>
+            </div>
+
+            <!-- Уровень 3: Наблюдения -->
+            <div class="level md:w-5/6 bg-amber-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥉</span>Наблюдательные исследования</h2>
+                <p class="text-sm">Ученые наблюдают за группами людей, не вмешиваясь. Такие исследования выявляют связь, но не всегда доказывают причину.</p>
+            </div>
+
+            <!-- Уровень 4: Основание пирамиды (самый слабый) -->
+            <div class="level w-full bg-slate-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🧱</span>Основание пирамиды</h2>
+                <p class="mb-3 text-sm"><strong>Начальный уровень.</strong> Основа для гипотез, но не прямое доказательство для людей. Включает:</p>
+                <ul class="list-none flex flex-wrap gap-2 text-xs">
+                    <li class="bg-slate-600 p-2 rounded-md">🧪 Исследования «в пробирке»</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🐁 Исследования на животных</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🗣️ Мнение эксперта</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🙋 Личный опыт</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
