@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Медицинская грамотность</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        .quiz-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .question-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .option-btn {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .correct {
+            background-color: #D1FAE5 !important;
+            border-color: #10B981 !important;
+            color: #065F46;
+        }
+        .incorrect {
+            background-color: #FEE2E2 !important;
+            border-color: #EF4444 !important;
+            color: #991B1B;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="quiz-container" class="quiz-container bg-white rounded-xl shadow-lg">
+        <div id="start-screen">
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-4">Тест по медицинской грамотности</h1>
+            <p class="text-center text-gray-600 mb-8">Узнайте, насколько хорошо вы разбираетесь в вопросах здоровья.</p>
+            <button id="start-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-lg">Начать тест</button>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <div id="progress-container" class="mb-6">
+                 <div class="flex justify-between items-center mb-2">
+                    <span id="question-counter" class="text-sm font-medium text-gray-600"></span>
+                    <span id="score" class="text-sm font-medium text-blue-600"></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="question-card" class="question-card">
+                <h2 id="question-text" class="text-2xl font-semibold mb-6 text-gray-900"></h2>
+                <div id="options-container" class="space-y-4"></div>
+            </div>
+            
+            <div id="feedback-container" class="mt-6 p-4 rounded-lg hidden">
+                <p id="feedback-text" class="font-medium"></p>
+            </div>
+
+            <button id="next-btn" class="w-full mt-8 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 hidden">Следующий вопрос</button>
+        </div>
+
+        <div id="result-screen" class="hidden text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Тест завершен!</h1>
+            <p class="text-lg text-gray-600 mb-2">Ваш результат:</p>
+            <p id="final-score" class="text-5xl font-extrabold text-blue-600 mb-6"></p>
+            <p id="result-message" class="text-md text-gray-700 mb-8"></p>
+            <button id="restart-btn" class="w-full bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300">Пройти еще раз</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const startScreen = document.getElementById("start-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+
+        const startBtn = document.getElementById("start-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const restartBtn = document.getElementById("restart-btn");
+        
+        const questionText = document.getElementById("question-text");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackContainer = document.getElementById("feedback-container");
+        const feedbackText = document.getElementById("feedback-text");
+        
+        const progressBar = document.getElementById("progress-bar");
+        const questionCounter = document.getElementById("question-counter");
+        const scoreDisplay = document.getElementById("score");
+        
+        const finalScore = document.getElementById("final-score");
+        const resultMessage = document.getElementById("result-message");
+
+        // --- Quiz Data ---
+        const quizData = [
+            {
+                question: "Что такое “медицинская грамотность”?",
+                options: [
+                    "Умение читать научные исследования о медицине.",
+                    "Умение разбираться в вопросах собственного здоровья и принимать правильные решения.",
+                    "Наличие высшего медицинского образования.",
+                    "Умение самостоятельно ставить себе диагноз и назначать лечение."
+                ],
+                answer: 1,
+                explanation: "Медицинская грамотность — это именно умение разбираться в вопросах собственного здоровья, чтобы быть активным участником процесса лечения."
+            },
+            {
+                question: "Что такое “эффект плацебо”?",
+                options: [
+                    "Побочный эффект от сильнодействующего лекарства.",
+                    "Аллергическая реакция на препарат.",
+                    "Улучшение состояния от приема “пустышки”, основанное на вере в лечение.",
+                    "Неэффективное лекарство, которое не прошло клинические испытания."
+                ],
+                answer: 2,
+                explanation: "Эффект плацебо — это реальный биологический механизм, когда самовнушение и вера в лечение приводят к улучшению самочувствия, даже если препарат не содержит действующего вещества."
+            },
+            {
+                question: "Почему прием антибиотиков при обычной простуде — ошибка?",
+                options: [
+                    "Потому что антибиотики слишком дорогие.",
+                    "Потому что они вызывают сонливость.",
+                    "Потому что простуда вызывается вирусами, а антибиотики действуют только на бактерии.",
+                    "Потому что они ослабляют иммунитет."
+                ],
+                answer: 2,
+                explanation: "Простуда (ОРВИ) — вирусное заболевание. Антибиотики бесполезны против вирусов. Улучшение наступает из-за естественного течения болезни, а не из-за лекарства."
+            },
+            {
+                question: "Какой из перечисленных признаков НЕ является “красным флажком” неэффективного лечения?",
+                options: [
+                    "Симптомы не проходят или ухудшаются.",
+                    "Появляются сильные побочные эффекты.",
+                    "Врач подробно и понятно объясняет диагноз и цель лечения.",
+                    "Вам назначают более пяти препаратов одновременно (полипрагмазия)."
+                ],
+                answer: 2,
+                explanation: "Четкое объяснение диагноза и плана лечения — это признак компетентного врача и хорошего подхода, а не неэффективной терапии."
+            },
+            {
+                question: "Что такое “полипрагмазия”?",
+                options: [
+                    "Использование народных средств вместе с лекарствами.",
+                    "Одновременное назначение пяти и более лекарств.",
+                    "Лечение хронического заболевания.",
+                    "Покупка самых дорогих препаратов."
+                ],
+                answer: 1,
+                explanation: "Полипрагмазия — это назначение неоправданно большого количества лекарств (обычно от 5 и более), что резко увеличивает риск побочных эффектов и нежелательных взаимодействий."
+            },
+            {
+                question: "Что рекомендуется делать пациентам с хроническими заболеваниями (диабет, гипертония)?",
+                options: [
+                    "Искать методы лечения в интернете.",
+                    "Регулярно менять врачей для получения разных мнений.",
+                    "Вести дневник симптомов и показателей здоровья.",
+                    "Самостоятельно увеличивать дозу лекарств при ухудшении состояния."
+                ],
+                answer: 2,
+                explanation: "Ведение дневника помогает и врачу, и пациенту объективно отслеживать динамику состояния и эффективность лечения."
+            },
+            {
+                question: "Если вы начали принимать лекарство и у вас появились сильные, невыносимые побочные эффекты, что нужно сделать?",
+                options: [
+                    "Терпеть, потому что любое лекарство имеет побочные эффекты.",
+                    "Немедленно прекратить прием и больше никогда не обращаться к этому врачу.",
+                    "Увеличить дозу, чтобы быстрее побороть болезнь.",
+                    "Повторно обратиться к врачу для коррекции лечения."
+                ],
+                answer: 3,
+                explanation: "Терпеть сильные побочные эффекты не нужно. Это повод для повторной консультации с врачом, чтобы скорректировать дозу или подобрать другой препарат."
+            },
+            {
+                question: "Какой из этих вопросов пациент ИМЕЕТ ПРАВО задать врачу?",
+                options: [
+                    "Какой у меня точный диагноз?",
+                    "Какова цель этого лекарства?",
+                    "Как мы поймем, что лечение работает?",
+                    "Все вышеперечисленные."
+                ],
+                answer: 3,
+                explanation: "Осознанный пациент имеет полное право задавать все эти вопросы, чтобы понимать логику лечения и быть его активным участником."
+            }
+        ];
+
+        // --- State Variables ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        // --- Functions ---
+        function startQuiz() {
+            startScreen.classList.add("hidden");
+            resultScreen.classList.add("hidden");
+            quizScreen.classList.remove("hidden");
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            nextBtn.classList.add("hidden");
+            showQuestion();
+            updateScoreDisplay();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.innerText = currentQuestion.question;
+            
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.classList.add("w-full", "text-left", "p-4", "rounded-lg", "border-2", "border-gray-300", "hover:bg-gray-100", "hover:border-blue-400", "option-btn");
+                button.dataset.index = index;
+                button.addEventListener("click", selectAnswer);
+                optionsContainer.appendChild(button);
+            });
+
+            updateProgress();
+        }
+        
+        function resetState() {
+            optionsContainer.innerHTML = "";
+            feedbackContainer.classList.add("hidden");
+            nextBtn.classList.add("hidden");
+            answerSelected = false;
+        }
+
+        function updateProgress() {
+            const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            questionCounter.innerText = `Вопрос ${currentQuestionIndex + 1} из ${quizData.length}`;
+        }
+        
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Баллы: ${score}`;
+        }
+
+        function selectAnswer(e) {
+            if (answerSelected) return;
+            answerSelected = true;
+
+            const selectedBtn = e.target;
+            const selectedIndex = parseInt(selectedBtn.dataset.index);
+            const correctIndex = quizData[currentQuestionIndex].answer;
+
+            // Disable all buttons
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove("hover:bg-gray-100", "hover:border-blue-400");
+            });
+
+            if (selectedIndex === correctIndex) {
+                score++;
+                selectedBtn.classList.add("correct");
+                feedbackText.innerText = "Правильно! " + quizData[currentQuestionIndex].explanation;
+                feedbackContainer.classList.remove("hidden", "bg-red-100", "text-red-700");
+                feedbackContainer.classList.add("bg-green-100", "text-green-700");
+            } else {
+                selectedBtn.classList.add("incorrect");
+                optionsContainer.children[correctIndex].classList.add("correct");
+                feedbackText.innerText = "Неверно. " + quizData[currentQuestionIndex].explanation;
+                feedbackContainer.classList.remove("hidden", "bg-green-100", "text-green-700");
+                feedbackContainer.classList.add("bg-red-100", "text-red-700");
+            }
+            
+            updateScoreDisplay();
+            nextBtn.classList.remove("hidden");
+        }
+
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.add("hidden");
+            resultScreen.classList.remove("hidden");
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            finalScore.innerText = `${percentage}%`;
+
+            let message = "";
+            if (percentage === 100) {
+                message = "Отлично! Вы прекрасно разбираетесь в принципах медицинской грамотности.";
+            } else if (percentage >= 75) {
+                message = "Очень хорошо! Вы усвоили большинство ключевых моментов.";
+            } else if (percentage >= 50) {
+                message = "Неплохо, но есть куда стремиться. Попробуйте перечитать статью, чтобы закрепить знания.";
+            } else {
+                message = "Стоит освежить знания. Перечитайте статью и попробуйте пройти тест еще раз.";
+            }
+            resultMessage.innerText = message;
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener("click", startQuiz);
+        nextBtn.addEventListener("click", showNextQuestion);
+        restartBtn.addEventListener("click", startQuiz);
+
+    </script>
+</body>
+</html>
