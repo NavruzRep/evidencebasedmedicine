@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инфографика: Зинабандии далелҳо дар тиб</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение шрифта Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Стили для контейнера пирамиды и ее уровней */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column; /* Располагаем уровни друг над другом */
+            align-items: center; /* Центрируем уровни */
+        }
+        .level {
+            transition: all 0.3s ease-in-out;
+            width: 100%; /* На мобильных устройствах уровень занимает всю ширину */
+        }
+        /* Эффект при наведении на уровень пирамиды */
+        .level:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            z-index: 10; /* Уровень будет поверх других при наведении */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">🔺 Зинабандии далелҳо дар тиб</h1>
+            <p class="text-lg text-gray-600">Дастури кӯтоҳ барои арзёбии таҳқиқотҳо</p>
+        </header>
+
+        <!-- Контейнер для пирамиды -->
+        <div class="pyramid-container space-y-2">
+
+            <!-- Уровень 1: Вершина пирамиды (самый надежный) -->
+            <div class="level md:w-1/2 bg-emerald-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥇</span>Шарҳҳои низомёфта ва мета-таҳлилҳо</h2>
+                <p class="text-sm"><strong>Сатҳи олӣ.</strong> Таҳлили ҳама таҳқиқоти босифат оид ба як мавзуъ барои ба даст овардани хулосаи боэътимодтарин.</p>
+            </div>
+
+            <!-- Уровень 2: Золотой стандарт -->
+            <div class="level md:w-2/3 bg-sky-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥈</span>Таҳқиқоти тасодуфии назоратшаванда (РКИ)</h2>
+                <p class="text-sm"><strong>“Меъёри тилоӣ” барои санҷиш.</strong> Гурӯҳҳои беморон ба таври тасодуфӣ дору ё бовар (плацебо) мегиранд, то таъсироти он ба таври объективӣ арзёбӣ гардад.</p>
+            </div>
+
+            <!-- Уровень 3: Наблюдения -->
+            <div class="level md:w-5/6 bg-amber-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🥉</span>Таҳқиқоти мушоҳидавӣ</h2>
+                <p class="text-sm">Олимон раванди зиндагии гурӯҳҳои одамонро бе дахолат назорат мекунанд. Ин гуна таҳқиқот робитаро ошкор мекунанд, вале на ҳамеша сабабҳоро исбот мекунанд.</p>
+            </div>
+
+            <!-- Уровень 4: Основание пирамиды (самый слабый) -->
+            <div class="level w-full bg-slate-500 text-white p-5 rounded-lg shadow-lg">
+                <h2 class="text-xl font-bold mb-2 flex items-center"><span class="text-2xl mr-3">🧱</span>Асоси пирамида</h2>
+                <p class="mb-3 text-sm"><strong>Сатҳи ибтидоӣ.</strong> Асос барои фарзияҳо, вале на далели мустақим барои инсонҳо. Ба ин дохил мешаванд:</p>
+                <ul class="list-none flex flex-wrap gap-2 text-xs">
+                    <li class="bg-slate-600 p-2 rounded-md">🧪 Таҳқиқот дар «пробирка»</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🐁 Таҳқиқот дар ҳайвонот</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🗣️ Андешаи коршинос</li>
+                    <li class="bg-slate-600 p-2 rounded-md">🙋 Таҷрибаи шахсӣ</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
