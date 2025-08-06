@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Санҷиш: Саводнокии тиббӣ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        .quiz-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .question-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .option-btn {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .correct {
+            background-color: #D1FAE5 !important;
+            border-color: #10B981 !important;
+            color: #065F46;
+        }
+        .incorrect {
+            background-color: #FEE2E2 !important;
+            border-color: #EF4444 !important;
+            color: #991B1B;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="quiz-container" class="quiz-container bg-white rounded-xl shadow-lg">
+        <div id="start-screen">
+            <h1 class="text-3xl font-bold text-center text-gray-900 mb-4">Санҷиш оид ба саводнокии тиббӣ</h1>
+            <p class="text-center text-gray-600 mb-8">Бифаҳмед, ки шумо то чӣ андоза дар масъалаҳои саломатӣ дониш доред.</p>
+            <button id="start-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-lg">Оғози санҷиш</button>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <div id="progress-container" class="mb-6">
+                 <div class="flex justify-between items-center mb-2">
+                    <span id="question-counter" class="text-sm font-medium text-gray-600"></span>
+                    <span id="score" class="text-sm font-medium text-blue-600"></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="question-card" class="question-card">
+                <h2 id="question-text" class="text-2xl font-semibold mb-6 text-gray-900"></h2>
+                <div id="options-container" class="space-y-4"></div>
+            </div>
+            
+            <div id="feedback-container" class="mt-6 p-4 rounded-lg hidden">
+                <p id="feedback-text" class="font-medium"></p>
+            </div>
+
+            <button id="next-btn" class="w-full mt-8 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 hidden">Саволи навбатӣ</button>
+        </div>
+
+        <div id="result-screen" class="hidden text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Санҷиш ба охир расид!</h1>
+            <p class="text-lg text-gray-600 mb-2">Натиҷаи шумо:</p>
+            <p id="final-score" class="text-5xl font-extrabold text-blue-600 mb-6"></p>
+            <p id="result-message" class="text-md text-gray-700 mb-8"></p>
+            <button id="restart-btn" class="w-full bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300">Бори дигар супоридан</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const startScreen = document.getElementById("start-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+
+        const startBtn = document.getElementById("start-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const restartBtn = document.getElementById("restart-btn");
+        
+        const questionText = document.getElementById("question-text");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackContainer = document.getElementById("feedback-container");
+        const feedbackText = document.getElementById("feedback-text");
+        
+        const progressBar = document.getElementById("progress-bar");
+        const questionCounter = document.getElementById("question-counter");
+        const scoreDisplay = document.getElementById("score");
+        
+        const finalScore = document.getElementById("final-score");
+        const resultMessage = document.getElementById("result-message");
+
+        // --- Quiz Data ---
+        const quizData = [
+            {
+                question: "“Саводнокии тиббӣ” чист?",
+                options: [
+                    "Маҳорати хондани тадқиқоти илмӣ оид ба тиб.",
+                    "Маҳорати дарки масъалаҳои саломатии худ ва қабули қарорҳои дуруст.",
+                    "Доштани маълумоти олии тиббӣ.",
+                    "Маҳорати мустақилона ба худ ташхис гузоштан ва табобат таъин кардан."
+                ],
+                answer: 1,
+                explanation: "Саводнокии тиббӣ — ин маҳз маҳорати дарки масъалаҳои саломатии худ мебошад, то иштирокчии фаъоли раванди табобат бошед."
+            },
+            {
+                question: "“Таъсири платсебо” чист?",
+                options: [
+                    "Таъсири манфии доруи қавитаъсир.",
+                    "Аксуламали аллергӣ ба дору.",
+                    "Беҳтар шудани вазъият аз қабули доруи “бетаъсир”, ки ба боварӣ ба табобат асос ёфтааст.",
+                    "Доруи бесамар, ки аз озмоишҳои клиникӣ нагузаштааст."
+                ],
+                answer: 2,
+                explanation: "Таъсири платсебо — ин механизми воқеии биологӣ аст, ки ҳангоми худтаъсиррасонӣ ва боварӣ ба табобат ба беҳтар шудани ҳолат оварда мерасонад, ҳатто агар дору моддаи таъсирбахш надошта бошад."
+            },
+            {
+                question: "Чаро ҳангоми шамолхӯрии оддӣ истеъмоли антибиотикҳо хатост?",
+                options: [
+                    "Зеро антибиотикҳо хеле қиматанд.",
+                    "Зеро онҳо хоболудиро ба вуҷуд меоранд.",
+                    "Зеро шамолхӯрӣ аз вирусҳо ба вуҷуд меояд ва антибиотикҳо танҳо ба бактерияҳо таъсир мерасонанд.",
+                    "Зеро онҳо масуниятро заиф мекунанд."
+                ],
+                answer: 2,
+                explanation: "Шамолхӯрӣ (ОРВИ) — бемории вирусӣ аст. Антибиотикҳо бар зидди вирусҳо бефоидаанд. Беҳбудӣ аз сабаби ҷараёни табиии беморӣ ба амал меояд, на аз ҳисоби дору."
+            },
+            {
+                question: "Кадоме аз аломатҳои зерин “парчами сурх”-и табобати бесамар НЕСТ?",
+                options: [
+                    "Аломатҳо аз байн намераванд ё бадтар мешаванд.",
+                    "Таъсироти манфии қавӣ пайдо мешаванд.",
+                    "Духтур ташхис ва мақсади табобатро муфассал ва фаҳмо шарҳ медиҳад.",
+                    "Ба шумо ҳамзамон зиёда аз панҷ дору таъин мекунанд (полипрагмазия)."
+                ],
+                answer: 2,
+                explanation: "Шарҳи дақиқи ташхис ва нақшаи табобат — ин нишонаи духтури босалоҳият ва муносибати хуб аст, на табобати бесамар."
+            },
+            {
+                question: "“Полипрагмазия” чист?",
+                options: [
+                    "Истифодаи воситаҳои халқӣ дар якҷоягӣ бо доруҳо.",
+                    "Таъини ҳамзамони панҷ ва зиёда доруҳо.",
+                    "Табобати бемории музмин.",
+                    "Харидани доруҳои аз ҳама қимат."
+                ],
+                answer: 1,
+                explanation: "Полипрагмазия — ин таъини беасоси миқдори зиёди доруҳо (одатан 5 ва зиёда аз он) мебошад, ки хатари таъсири манфӣ ва таъсири мутақобилаи номатлубро якбора зиёд мекунад."
+            },
+            {
+                question: "Ба беморони гирифтори бемориҳои музмин (диабети қанд, гипертония) чӣ тавсия дода мешавад?",
+                options: [
+                    "Ҷустуҷӯи усулҳои табобат дар интернет.",
+                    "Мунтазам иваз кардани духтурон барои гирифтани ақидаҳои гуногун.",
+                    "Пеш бурдани рӯзномаи аломатҳо ва нишондиҳандаҳои саломатӣ.",
+                    "Мустақилона зиёд кардани миқдори дору ҳангоми бад шудани вазъ."
+                ],
+                answer: 2,
+                explanation: "Пеш бурдани рӯзнома ҳам ба духтур ва ҳам ба бемор кӯмак мекунад, ки динамикаи вазъ ва самаранокии табобатро объективона пайгирӣ кунанд."
+            },
+            {
+                question: "Агар шумо истеъмоли доруро оғоз карда бошеду таъсири манфии қавӣ ва тоқатфарсо пайдо шавад, чӣ бояд кард?",
+                options: [
+                    "Тоқат кардан, зеро ҳар як дору таъсири манфӣ дорад.",
+                    "Фавран қатъ кардани истеъмол ва дигар ҳеҷ гоҳ ба ин духтур муроҷиат накардан.",
+                    "Зиёд кардани миқдор барои зудтар мағлуб кардани беморӣ.",
+                    "Барои ислоҳи табобат такроран ба духтур муроҷиат кардан."
+                ],
+                answer: 3,
+                explanation: "Ба таъсири манфии қавӣ тоқат кардан лозим нест. Ин сабаби машварати такрорӣ бо духтур барои ислоҳи миқдор ё интихоби доруи дигар аст."
+            },
+            {
+                question: "Кадоме аз ин саволҳоро бемор ҲУҚУҚ дорад ба духтур диҳад?",
+                options: [
+                    "Ташхиси дақиқи ман чист?",
+                    "Мақсади ин дору чист?",
+                    "Мо аз куҷо мефаҳмем, ки табобат таъсир мекунад?",
+                    "Ҳамаи гуфтаҳои боло."
+                ],
+                answer: 3,
+                explanation: "Бемори бошуурона ҳуқуқи пурра дорад, ки ҳамаи ин саволҳоро диҳад, то мантиқи табобатро дарк кунад ва иштирокчии фаъоли он бошад."
+            }
+        ];
+
+        // --- State Variables ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerSelected = false;
+
+        // --- Functions ---
+        function startQuiz() {
+            startScreen.classList.add("hidden");
+            resultScreen.classList.add("hidden");
+            quizScreen.classList.remove("hidden");
+            currentQuestionIndex = 0;
+            score = 0;
+            answerSelected = false;
+            nextBtn.classList.add("hidden");
+            showQuestion();
+            updateScoreDisplay();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.innerText = currentQuestion.question;
+            
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.classList.add("w-full", "text-left", "p-4", "rounded-lg", "border-2", "border-gray-300", "hover:bg-gray-100", "hover:border-blue-400", "option-btn");
+                button.dataset.index = index;
+                button.addEventListener("click", selectAnswer);
+                optionsContainer.appendChild(button);
+            });
+
+            updateProgress();
+        }
+        
+        function resetState() {
+            optionsContainer.innerHTML = "";
+            feedbackContainer.classList.add("hidden");
+            nextBtn.classList.add("hidden");
+            answerSelected = false;
+        }
+
+        function updateProgress() {
+            const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            questionCounter.innerText = `Саволи ${currentQuestionIndex + 1} аз ${quizData.length}`;
+        }
+        
+        function updateScoreDisplay() {
+            scoreDisplay.innerText = `Холҳо: ${score}`;
+        }
+
+        function selectAnswer(e) {
+            if (answerSelected) return;
+            answerSelected = true;
+
+            const selectedBtn = e.target;
+            const selectedIndex = parseInt(selectedBtn.dataset.index);
+            const correctIndex = quizData[currentQuestionIndex].answer;
+
+            // Disable all buttons
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove("hover:bg-gray-100", "hover:border-blue-400");
+            });
+
+            if (selectedIndex === correctIndex) {
+                score++;
+                selectedBtn.classList.add("correct");
+                feedbackText.innerText = "Дуруст! " + quizData[currentQuestionIndex].explanation;
+                feedbackContainer.classList.remove("hidden", "bg-red-100", "text-red-700");
+                feedbackContainer.classList.add("bg-green-100", "text-green-700");
+            } else {
+                selectedBtn.classList.add("incorrect");
+                optionsContainer.children[correctIndex].classList.add("correct");
+                feedbackText.innerText = "Нодуруст. " + quizData[currentQuestionIndex].explanation;
+                feedbackContainer.classList.remove("hidden", "bg-green-100", "text-green-700");
+                feedbackContainer.classList.add("bg-red-100", "text-red-700");
+            }
+            
+            updateScoreDisplay();
+            nextBtn.classList.remove("hidden");
+        }
+
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.add("hidden");
+            resultScreen.classList.remove("hidden");
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            finalScore.innerText = `${percentage}%`;
+
+            let message = "";
+            if (percentage === 100) {
+                message = "Аъло! Шумо принсипҳои саводнокии тиббиро хеле хуб мефаҳмед.";
+            } else if (percentage >= 75) {
+                message = "Хеле хуб! Шумо аксари нуктаҳои асосиро аз худ кардед.";
+            } else if (percentage >= 50) {
+                message = "Бад нест, аммо ҷой барои рушд вуҷуд дорад. Кӯшиш кунед, ки мақоларо бори дигар хонед, то донишатонро мустаҳкам кунед.";
+            } else {
+                message = "Донишатонро тароват додан лозим аст. Мақоларо аз нав хонед ва кӯшиш кунед, ки санҷишро бори дигар супоред.";
+            }
+            resultMessage.innerText = message;
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener("click", startQuiz);
+        nextBtn.addEventListener("click", showNextQuestion);
+        restartBtn.addEventListener("click", startQuiz);
+
+    </script>
+</body>
+</html>
